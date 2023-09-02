@@ -7,9 +7,11 @@ import java.net.URL
 
 @Parcelize
 data class ImageInfo(
-    val url: String? = null,
-    val views: Long? = null,
-    val likes: Long? = null,
-    val downloads: Long? = null,
-    val tags: String? = null
+    val id: Int,
+    val previewURL: String,
+    val url: String,
+    val views: Int,
+    val likes: Int,
+    val downloads: Int,
+    val tags: String
 ) : Parcelable, BaseObservable()

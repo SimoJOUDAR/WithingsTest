@@ -6,13 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.android.volley.RequestQueue
 import dagger.hilt.android.AndroidEntryPoint
 import fr.mjoudar.withingstest.databinding.FragmentHomepageBinding
 import fr.mjoudar.withingstest.domain.models.ImageInfo
-
+import fr.mjoudar.withingstest.utils.columnNumberCalculator
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Loading as Loading
+import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Error as Error
+import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Success as Success
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -21,9 +28,13 @@ class HomepageFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: HomepageViewModel by viewModels()
     private lateinit var adapter: HomepageGridAdapter
-    lateinit var request: RequestQueue
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = FragmentHomepageBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -32,6 +43,7 @@ class HomepageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setRecyclerView()
         setListeners()
+        collectData()
     }
 
     private fun setRecyclerView() {
@@ -44,19 +56,48 @@ class HomepageFragment : Fragment() {
         val onContextClickListener = View.OnContextClickListener { true }
         adapter = HomepageGridAdapter(onItemClickListener, onContextClickListener)
         binding.recyclerview.adapter = adapter
-        binding.recyclerview.layoutManager = GridLayoutManager(requireContext(), columnNumberCalculator()) // For screen size adaptability
+        binding.recyclerview.layoutManager = with(requireContext()) {
+            GridLayoutManager(this, this.columnNumberCalculator())
+        }
     }
 
     private fun setListeners() {
+        binding.searchBtn.setOnClickListener {
+            binding.searchEditText.text?.let { editable ->
+                with(editable.toString()) {
+                    if (!isNullOrEmpty())
+                        viewModel.getResults(this)
+                }
+            }
+        }
         binding.detailsBtn.setOnClickListener {
             navigateToDetails()
         }
     }
 
+    private fun collectData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.imageLot.collectLatest {
+                    when (it) {
+                        is Loading -> displayIsLoading()
+                        is Error -> displayError(it.error)
+                        is Success -> displayData(it.images)
+                    }
+                }
+            }
+        }
+    }
+
     private fun navigateToDetails() {
-        val images = viewModel.getSelectedItems()
-        if (images.size >= 2)
-            findNavController().navigate(HomepageFragmentDirections.actionHomepageFragmentToDetailsFragment(images))
+        viewModel.getSelectedItems().let {
+            if (it.size >= 2)
+                findNavController().navigate(
+                    HomepageFragmentDirections.actionHomepageFragmentToDetailsFragment(
+                        it
+                    )
+                )
+        }
     }
 
     override fun onDestroyView() {
@@ -64,18 +105,24 @@ class HomepageFragment : Fragment() {
         _binding = null
     }
 
-    private fun fetchData() {
-
+    private fun displayIsLoading() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.recyclerview.visibility = View.INVISIBLE
+        binding.errorLayout.errorPage.visibility = View.GONE
     }
 
-    /**
-     * Return the number of columns that can fit in a Grid depending on the screen dimensions
-     */
-    private fun columnNumberCalculator() : Int {
-        val recyclerViewItemWidth = 176
-        val displayMetrics = requireContext().resources.displayMetrics
-        val dpWidth = displayMetrics.widthPixels / displayMetrics.density
-        return (dpWidth / recyclerViewItemWidth).toInt()
+    private fun displayError(e: Exception) {
+        binding.errorLayout.errorText.text = e.toString()
+        binding.progressBar.visibility = View.GONE
+        binding.recyclerview.visibility = View.GONE
+        binding.errorLayout.errorPage.visibility = View.VISIBLE
+    }
+
+    private fun displayData(data: List<ImageInfo>) {
+        binding.progressBar.visibility = View.GONE
+        binding.recyclerview.visibility = View.VISIBLE
+        binding.errorLayout.errorPage.visibility = View.GONE
+        ((binding.recyclerview.adapter) as HomepageGridAdapter).setData(data)
     }
 
 }

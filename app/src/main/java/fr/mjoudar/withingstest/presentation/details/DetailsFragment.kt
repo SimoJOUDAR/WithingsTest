@@ -11,6 +11,7 @@ import fr.mjoudar.withingstest.R
 import fr.mjoudar.withingstest.databinding.FragmentDetailsBinding
 import fr.mjoudar.withingstest.domain.models.ImageInfo
 import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel
+import fr.mjoudar.withingstest.utils.Constants.Companion.IMAGES
 
 @AndroidEntryPoint
 class DetailsFragment : Fragment() {
@@ -19,7 +20,11 @@ class DetailsFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: DetailsViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,12 +41,9 @@ class DetailsFragment : Fragment() {
                 viewModel.setData(images.toList())
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val IMAGES = "images"
     }
 }

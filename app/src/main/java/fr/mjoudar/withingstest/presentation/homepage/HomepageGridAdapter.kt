@@ -14,7 +14,7 @@ class HomepageGridAdapter(
 
     private var images = listOf<ImageInfo>()
 
-    class ImageViewHolder(val bining: LayoutImageItemBinding) : RecyclerView.ViewHolder(bining.root)
+    class ImageViewHolder(val binding: LayoutImageItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val binding = LayoutImageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,7 +22,7 @@ class HomepageGridAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bining.imageInfo = images[position]
+        holder.binding.imageInfo = images[position]
         with(holder.itemView) {
             tag = images[position]
             setOnClickListener(onItemClickListener)
@@ -36,6 +36,7 @@ class HomepageGridAdapter(
     // Set Adapter's data from outside the class
     fun setData(data: List<ImageInfo>) {
         images = data
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

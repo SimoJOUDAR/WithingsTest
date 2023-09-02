@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DetailsViewModel @Inject constructor(): ViewModel() {
+class DetailsViewModel @Inject constructor() : ViewModel() {
 
 
     private val _imageLot = MutableStateFlow<List<ImageInfo>>(listOf())
@@ -21,7 +21,7 @@ class DetailsViewModel @Inject constructor(): ViewModel() {
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000)
     )
 
-    fun setData(images: List<ImageInfo>) = viewModelScope.launch(Dispatchers.IO){
+    fun setData(images: List<ImageInfo>) = viewModelScope.launch(Dispatchers.IO) {
         _imageLot.emit(images)
     }
 }
