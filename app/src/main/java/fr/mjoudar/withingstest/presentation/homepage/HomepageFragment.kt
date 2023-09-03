@@ -1,6 +1,7 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -48,9 +49,8 @@ class HomepageFragment : Fragment() {
 
     private fun setRecyclerView() {
         val onItemClickListener = View.OnClickListener { itemView ->
-            val imageInfo = itemView.tag as ImageInfo?
-            imageInfo?.let {
-                viewModel.itemClicked(it)
+            (itemView.tag as Int).let { position ->
+                viewModel.itemClicked(position)
             }
         }
         val onContextClickListener = View.OnContextClickListener { true }
@@ -79,10 +79,11 @@ class HomepageFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.imageLot.collectLatest {
+                    Log.d("Panda_test", "collected")
                     when (it) {
                         is Loading -> displayIsLoading()
                         is Error -> displayError(it.error)
-                        is Success -> displayData(it.images)
+                        is Success -> displayData(it.images, it.position)
                     }
                 }
             }
@@ -118,11 +119,11 @@ class HomepageFragment : Fragment() {
         binding.errorLayout.errorPage.visibility = View.VISIBLE
     }
 
-    private fun displayData(data: List<ImageInfo>) {
+    private fun displayData(data: List<ImageInfo>, position: Int?) {
         binding.progressBar.visibility = View.GONE
         binding.recyclerview.visibility = View.VISIBLE
         binding.errorLayout.errorPage.visibility = View.GONE
-        ((binding.recyclerview.adapter) as HomepageGridAdapter).setData(data)
+        ((binding.recyclerview.adapter) as HomepageGridAdapter).setData(data, position)
     }
 
 }

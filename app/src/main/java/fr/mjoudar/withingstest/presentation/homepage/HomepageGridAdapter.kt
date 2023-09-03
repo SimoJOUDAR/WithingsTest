@@ -1,5 +1,6 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
+import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,21 +23,22 @@ class HomepageGridAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.binding.imageInfo = images[position]
+        with(images[position]) {
+            holder.binding.imageInfo = this
+            holder.binding.frame.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
         with(holder.itemView) {
-            tag = images[position]
+            tag = position
             setOnClickListener(onItemClickListener)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 setOnContextClickListener(onContextClickListener)
             }
-            //TODO highlight image frame
         }
     }
 
-    // Set Adapter's data from outside the class
-    fun setData(data: List<ImageInfo>) {
+    fun setData(data: List<ImageInfo>, position: Int? = null) {
         images = data
-        notifyDataSetChanged()
+        position?.let { notifyItemChanged(it) } ?: notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

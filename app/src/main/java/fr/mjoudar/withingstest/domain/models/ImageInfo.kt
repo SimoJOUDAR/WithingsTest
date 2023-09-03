@@ -13,5 +13,6 @@ data class ImageInfo(
     val views: Int,
     val likes: Int,
     val downloads: Int,
-    val tags: String
+    val tags: String,
+    val isChecked: Boolean = false
 ) : Parcelable, BaseObservable()

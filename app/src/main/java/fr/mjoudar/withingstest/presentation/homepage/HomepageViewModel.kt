@@ -1,5 +1,6 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,7 @@ class HomepageViewModel @Inject constructor(
     private val repository: ImageRepository
 ) : ViewModel() {
 
-    private var selectedItems = mutableListOf<ImageInfo>()
+    private var items = mutableListOf<ImageInfo>()
 
     private val _imageLot = MutableStateFlow<ImagesUiState>(ImagesUiState.Loading)
     val imageLot = _imageLot.asStateFlow().stateIn(
@@ -36,29 +37,26 @@ class HomepageViewModel @Inject constructor(
             Exception("An unidentified error occurred. We couldn't load the data. Please, check your internet connection.")
         val response = repository.getData(input)
         if (response.isSuccessful) {
-            _imageLot.emit(ImagesUiState.Success(response.body.hits?.map { it.toImageInfo() }
-                ?: listOf()))
+            items = response.body.hits?.map { it.toImageInfo() }?.toMutableList() ?: mutableListOf()
+            _imageLot.emit(ImagesUiState.Success(items))
         } else {
             val e = response.exception ?: defaultException
             _imageLot.emit(ImagesUiState.Error(e))
         }
     }
 
-    //
-    fun itemClicked(image: ImageInfo) {
-        if (selectedItems.contains(image))
-            selectedItems.remove(image)
-        else
-            selectedItems.add(image)
+    fun itemClicked(position: Int) = viewModelScope.launch(Dispatchers.IO) {
+        items[position] = items[position].copy(isChecked = !items[position].isChecked)
+        _imageLot.emit(ImagesUiState.Success(items, position))
     }
 
     fun getSelectedItems(): Array<ImageInfo> {
-        return selectedItems.toTypedArray()
+        return items.filter { it.isChecked }.toTypedArray()
     }
 
     sealed class ImagesUiState {
         object Loading : ImagesUiState()
-        data class Success(val images: List<ImageInfo>) : ImagesUiState()
+        data class Success(val images: List<ImageInfo>, val position: Int? = null) : ImagesUiState()
         data class Error(val error: Exception) : ImagesUiState()
     }
 }
