@@ -1,27 +1,34 @@
 package fr.mjoudar.withingstest.presentation.details
 
+import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import fr.mjoudar.withingstest.domain.models.ImageInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import androidx.work.*
+import fr.mjoudar.withingstest.domain.processing.GifCreatorWorker
+import fr.mjoudar.withingstest.utils.Constants.Companion.IMAGE_URLS
 import javax.inject.Inject
 
 class DetailsViewModel @Inject constructor() : ViewModel() {
 
+    fun createGif(context: Context, urls: Array<String>): LiveData<WorkInfo> {
 
-    private val _imageLot = MutableStateFlow<List<ImageInfo>>(listOf())
-    val imageLot = _imageLot.asStateFlow().stateIn(
-        scope = viewModelScope,
-        initialValue = listOf(),
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000)
-    )
+        val inputData = Data.Builder()
+            .putStringArray(IMAGE_URLS, urls)
+            .build()
 
-    fun setData(images: List<ImageInfo>) = viewModelScope.launch(Dispatchers.IO) {
-        _imageLot.emit(images)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<GifCreatorWorker>()
+            .setConstraints(constraints)
+            .setInputData(inputData)
+            .build()
+
+        with(WorkManager.getInstance(context)) {
+            enqueue(workRequest)
+
+            return getWorkInfoByIdLiveData(workRequest.id)
+        }
     }
 }

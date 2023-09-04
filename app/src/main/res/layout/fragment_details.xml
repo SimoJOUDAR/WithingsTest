@@ -5,37 +5,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="image1"
-            type="fr.mjoudar.withingstest.domain.models.ImageInfo" />
-        <variable
-            name="image2"
-            type="fr.mjoudar.withingstest.domain.models.ImageInfo" />
-    </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         tools:context=".presentation.details.DetailsFragment">
 
-        <ScrollView
+        <ImageView
+            android:id="@+id/gif"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:layout_margin="16dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <include
+            android:id="@+id/processing_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/layout_processing" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hello"/>
+        <include
+            android:id="@+id/error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            layout="@layout/layout_error" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </ScrollView>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -30,9 +30,7 @@ class HomepageGridAdapter(
         with(holder.itemView) {
             tag = position
             setOnClickListener(onItemClickListener)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                setOnContextClickListener(onContextClickListener)
-            }
+            //setOnContextClickListener(onContextClickListener)
         }
     }
 

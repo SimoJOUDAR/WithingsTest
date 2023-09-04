@@ -24,7 +24,7 @@
         android:label="fragment_details"
         tools:layout="@layout/fragment_details" >
         <argument
-            android:name="images"
-            app:argType="fr.mjoudar.withingstest.domain.models.ImageInfo[]" />
+            android:name="urls"
+            app:argType="string[]" />
     </fragment>
 </navigation>

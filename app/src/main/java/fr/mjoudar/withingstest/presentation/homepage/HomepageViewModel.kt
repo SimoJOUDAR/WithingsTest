@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,13 +47,15 @@ class HomepageViewModel @Inject constructor(
         }
     }
 
-    fun itemClicked(position: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun itemClicked(position: Int) {
         items[position] = items[position].copy(isChecked = !items[position].isChecked)
-        _imageLot.emit(ImagesUiState.Success(items, position))
+            viewModelScope.launch(Dispatchers.IO) {
+                _imageLot.emit(ImagesUiState.Success(items, position))
+            }
     }
 
-    fun getSelectedItems(): Array<ImageInfo> {
-        return items.filter { it.isChecked }.toTypedArray()
+    fun getSelectedItems(): Array<String> {
+        return items.filter { it.isChecked }.map { it.url }.toTypedArray()
     }
 
     sealed class ImagesUiState {

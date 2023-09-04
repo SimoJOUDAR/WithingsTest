@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Select images to mount"
+            android:text="@string/homepage_title"
             android:theme="@style/LatoTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -42,7 +42,7 @@
                 android:id="@+id/search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Type a keyword here for your search" />
+                android:hint="@string/search_bar_hint" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,7 +53,7 @@
             android:src="@drawable/ic_search"
             app:cardCornerRadius="6dp"
             android:layout_marginStart="10dp"
-            android:backgroundTint="@color/design_default_color_primary"
+            android:backgroundTint="?attr/colorPrimary"
             app:layout_constraintStart_toEndOf="@id/search_input_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/search_input_layout"
@@ -82,7 +82,7 @@
             android:id="@+id/details_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mount the selection"
+            android:text="@string/homepage_bottom_button_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recyclerview"
@@ -92,7 +92,7 @@
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateTint="@color/design_default_color_primary"
+            android:indeterminateTint="?attr/colorPrimary"
             android:visibility="gone"
             android:background="@null"
             app:layout_constraintBottom_toBottomOf="parent"

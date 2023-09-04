@@ -4,8 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/black"
+    android:background="?attr/colorPrimary"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
@@ -25,7 +24,7 @@
             android:gravity="center"
             android:padding="30dp"
             android:theme="@style/Lato"
-            tools:text="An error has occurred" />
+            android:text="@string/unidentified_error_message" />
 
     </androidx.cardview.widget.CardView>
 

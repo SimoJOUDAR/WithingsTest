@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">WithingsTest</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="permission_rationale">We need storage permissions to use this feature.</string>
+    <string name="permission_allow">Allow</string>
+    <string name="permission_deny">Deny</string>
+    <string name="homepage_title">Select images to mount</string>
+    <string name="search_bar_hint">Type a keyword here for your search</string>
+    <string name="homepage_bottom_button_text">Create a Gif</string>
+    <string name="unidentified_error_message">An error has occurred</string>
+    <string name="processing">Processing</string>
 </resources>

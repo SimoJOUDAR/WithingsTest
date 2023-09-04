@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.WithingsTest" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/picton_purple</item>
+        <item name="colorPrimaryVariant">@color/picton_purple_blue</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -25,6 +25,12 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/dark_grey</item>
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="PrimaryLatoTitle" parent="android:Widget.TextView">
+        <item name="fontFamily">@font/lato</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">26sp</item>
     </style>
 
 </resources>
