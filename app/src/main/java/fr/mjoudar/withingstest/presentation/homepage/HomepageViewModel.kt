@@ -1,19 +1,18 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.mjoudar.withingstest.data.repository.ImageRepository
 import fr.mjoudar.withingstest.domain.models.ImageInfo
+import fr.mjoudar.withingstest.utils.Constants.Companion.UNKNOWN_EXCEPTION
+import fr.mjoudar.withingstest.utils.toImageInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,14 +34,12 @@ class HomepageViewModel @Inject constructor(
     }
 
     fun getResults(input: String) = viewModelScope.launch(Dispatchers.IO) {
-        val defaultException =
-            Exception("An unidentified error occurred. We couldn't load the data. Please, check your internet connection.")
         val response = repository.getData(input)
-        if (response.isSuccessful) {
-            items = response.body.hits?.map { it.toImageInfo() }?.toMutableList() ?: mutableListOf()
+        if (response.succeeded) {
+            items = response.body.toImageInfo()
             _imageLot.emit(ImagesUiState.Success(items))
         } else {
-            val e = response.exception ?: defaultException
+            val e = response.exception ?: UNKNOWN_EXCEPTION
             _imageLot.emit(ImagesUiState.Error(e))
         }
     }

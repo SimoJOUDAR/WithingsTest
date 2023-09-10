@@ -16,13 +16,13 @@ import java.util.concurrent.ExecutionException
 
 class GifCreatorWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    val fileName = getGifFileNaming()
+    private val fileName = getGifFileNaming()
 
     override fun doWork(): Result {
         val imageUrls = inputData.getStringArray(IMAGE_URLS) ?: return Result.failure()
 
         return try {
-            with(createGifFromUrls(applicationContext, imageUrls)) {
+            with(createGifFromUrls(applicationContext, imageUrls, fileName)) {
                 if (this) {
                     val outputData = Data.Builder()
                         .putString(GIF_FILE_NAME, fileName)
@@ -41,7 +41,7 @@ class GifCreatorWorker(context: Context, params: WorkerParameters) : Worker(cont
         }
     }
 
-    private fun createGifFromUrls(context: Context, imageUrls: Array<String>): Boolean {
+    private fun createGifFromUrls(context: Context, imageUrls: Array<String>, fileName: String): Boolean {
         val outputGifFile = File(context.getExternalFilesDir(null), fileName)
         val bitmapList = mutableListOf<Bitmap>()
 

@@ -1,13 +1,10 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,13 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import fr.mjoudar.withingstest.databinding.FragmentHomepageBinding
 import fr.mjoudar.withingstest.domain.models.ImageInfo
+import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.*
 import fr.mjoudar.withingstest.utils.columnNumberCalculator
 import fr.mjoudar.withingstest.utils.hideSoftInput
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Loading as Loading
-import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Error as Error
-import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel.ImagesUiState.Success as Success
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -56,8 +51,7 @@ class HomepageFragment : Fragment() {
                 viewModel.itemClicked(position)
             }
         }
-        val onContextClickListener = View.OnContextClickListener { true }
-        adapter = HomepageGridAdapter(onItemClickListener, onContextClickListener)
+        adapter = HomepageGridAdapter(onItemClickListener)
         binding.recyclerview.adapter = adapter
         binding.recyclerview.layoutManager = with(requireContext()) {
             GridLayoutManager(this, this.columnNumberCalculator())
@@ -83,7 +77,6 @@ class HomepageFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.imageLot.collectLatest {
-                    Log.d("Panda_test", "collected")
                     when (it) {
                         is Loading -> displayIsLoading()
                         is Error -> displayError(it.error)

@@ -3,7 +3,6 @@ package fr.mjoudar.withingstest.domain.models
 import android.os.Parcelable
 import androidx.databinding.BaseObservable
 import kotlinx.android.parcel.Parcelize
-import java.net.URL
 
 @Parcelize
 data class ImageInfo(

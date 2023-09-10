@@ -1,6 +1,5 @@
 package fr.mjoudar.withingstest.presentation.homepage
 
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +8,7 @@ import fr.mjoudar.withingstest.databinding.LayoutImageItemBinding
 import fr.mjoudar.withingstest.domain.models.ImageInfo
 
 class HomepageGridAdapter(
-    private val onItemClickListener: View.OnClickListener,
-    private val onContextClickListener: View.OnContextClickListener
+    private val onItemClickListener: View.OnClickListener
 ) : RecyclerView.Adapter<HomepageGridAdapter.ImageViewHolder>() {
 
     private var images = listOf<ImageInfo>()
@@ -30,7 +28,6 @@ class HomepageGridAdapter(
         with(holder.itemView) {
             tag = position
             setOnClickListener(onItemClickListener)
-            //setOnContextClickListener(onContextClickListener)
         }
     }
 

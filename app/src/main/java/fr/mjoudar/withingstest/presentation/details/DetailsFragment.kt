@@ -9,15 +9,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.WorkInfo
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import dagger.hilt.android.AndroidEntryPoint
 import fr.mjoudar.withingstest.R
 import fr.mjoudar.withingstest.databinding.FragmentDetailsBinding
+import fr.mjoudar.withingstest.presentation.homepage.HomepageViewModel
 import fr.mjoudar.withingstest.utils.Constants.Companion.GIF_FILE_NAME
 import fr.mjoudar.withingstest.utils.Constants.Companion.URLS
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
@@ -43,7 +48,6 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        displayProcessingLayout()
         requestStoragePermissions()
     }
 
@@ -51,18 +55,21 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         arguments?.let { bundle ->
             (bundle.getStringArray(URLS))?.let {
                 if (it.isNotEmpty() && it.size >= 2) {
-                    viewModel.createGif(requireContext(), it).observe(
-                        viewLifecycleOwner
-                    ) { workInfo ->
-                        when (workInfo.state) {
-                            WorkInfo.State.SUCCEEDED -> {
-                                workInfo.outputData.getString(GIF_FILE_NAME)?.let { fileName ->
-                                    displayGif(fileName)
-                                } ?: displayErrorLayout()
-                            }
-                            WorkInfo.State.FAILED -> displayErrorLayout()
-                            else -> {}
-                        }
+                    viewModel.createGif(requireContext(), it)
+                    collectData()
+                }
+            }
+        }
+    }
+
+    private fun collectData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.processingState.collectLatest {
+                    when (it) {
+                        DetailsViewModel.GifUiState.Loading -> displayProcessingLayout()
+                        is DetailsViewModel.GifUiState.Success -> displayGif(it.fileName)
+                        is DetailsViewModel.GifUiState.Error -> displayErrorLayout()
                     }
                 }
             }
@@ -75,7 +82,7 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         with(File(externalFilesDir, fileName)) {
             if (exists())
                 path = absolutePath
-            else{
+            else {
                 displayErrorLayout()
                 return
             }
@@ -91,7 +98,8 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
 
     private fun displayProcessingLayout() {
-        val source: ImageDecoder.Source = ImageDecoder.createSource(resources, R.drawable.ic_processing)
+        val source: ImageDecoder.Source =
+            ImageDecoder.createSource(resources, R.drawable.ic_processing)
         val drawable = ImageDecoder.decodeDrawable(source)
         binding.processingLayout.processingLayout.visibility = View.VISIBLE
         binding.processingLayout.processingGif.setImageDrawable(drawable)
@@ -101,7 +109,6 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private fun displayErrorLayout() {
         binding.processingLayout.processingLayout.visibility = View.GONE
         binding.errorLayout.errorPage.visibility = View.VISIBLE
-
     }
 
     override fun onDestroyView() {
@@ -136,10 +143,7 @@ class DetailsFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms))
-            AppSettingsDialog.Builder(this).build().show()
-        else
-            childFragmentManager.popBackStack()
+        AppSettingsDialog.Builder(this).build().show()
     }
 
     override fun onRequestPermissionsResult(
